@@ -13,7 +13,36 @@ abstract contract Beneficiaries is Permissioned {
     uint256 constant MAXIMUM_BENEFICIARIES = 20;
     
     IERC20 public _outToken;
-ReentrancyGuard
+
+    address[] private _beneficiaries;
+    uint256[] private _beneficiariesDenormWeight;
+    uint256 private _totalWeight;
+    
+    mapping(address => uint256) private _beneficiariesBalance;
+    uint256 _feeToDistribute;
+
+    function _setOutputToken(IERC20 outToken) internal {
+        _outToken = outToken;
+    }
+
+    function getBeneficiaries() external view returns (address[] memory) {
+        return _beneficiaries;
+    }
+
+    function _addBeneficiary(address beneficiary, uint256 denormWeight) internal {
+        _totalWeight += denormWeight;
+
+        _beneficiaries.push(beneficiary);
+        _beneficiariesDenormWeight.push(denormWeight);
+
+        emit BeneficiaryAdded(beneficiary, denormWeight, _totalWeight);
+    }
+
+    function addBeneficiary(address beneficiary, uint256 denormWeight) onlyOwner external override {
+        require(_beneficiaries.length < MAXIMUM_BENEFICIARIES, "FC: MAXIMUM BENEFICIARIES");
+        _addBeneficiary(beneficiary, denormWeight);
+    }
+
     function _indexOfBeneficiary(address beneficiary) internal view returns (uint256 index) {
         for (index = 0; index < _beneficiaries.length; index++) {
             if (_beneficiaries[index] == beneficiary) {
