@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity =0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -9,11 +11,6 @@ abstract contract TokenManagable is Permissioned {
     using SafeERC20 for IERC20;
     
     mapping(IERC20 => ITokenExchange) private _tokenExchanges;
-
-    modifier tokenIsExchangable(IERC20 token) {
-        require(address(_tokenExchanges[token]) != address(0));
-        _;
-    }
 
     function addToken(IERC20 token, ITokenExchange tokenExchange) onlyOwner external override {
         _tokenExchanges[token] = tokenExchange;
@@ -29,5 +26,10 @@ abstract contract TokenManagable is Permissioned {
 
     function removeToken(IERC20 token) onlyOwner external override {
         _tokenExchanges[token] = ITokenExchange(address(0)); 
+    }
+
+    function getTokenExchange(IERC20 token) public view returns (ITokenExchange exchange) {
+        exchange = _tokenExchanges[token];
+        require(address(exchange) != address(0), "FC: TOKEN NOT EXCHANGABLE");
     }
 }

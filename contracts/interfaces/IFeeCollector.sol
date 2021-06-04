@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity =0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -13,14 +15,12 @@ interface IFeeCollector {
     function removeToken(IERC20 token) external;
 
     event TokenSwapped(IERC20 indexed token, uint256 amountIn, uint256 amountOut, ITokenExchange exchange);
-    event FeeCollected(uint256 feeAmount);
 
-    function swap(IERC20 token, uint256 minAmountOut) external;
-    function swapMany(IERC20[] calldata tokens, uint256[] calldata minAmountsOut) external;
+    function swap(IERC20 token, uint256 minAmountOut) external returns (uint256);
+    function swapMany(IERC20[] calldata tokens, uint256[] calldata minAmountsOut) external returns (uint256);
 
     event FeeClaimed(address indexed beneficiary, uint256 amount);
 
-    function updateBalances() external;
     function withdraw() external;
     function withdrawFor(address beneficiary) external;
 
@@ -33,6 +33,10 @@ interface IFeeCollector {
     function updateBeneficiaryAt(uint256 index, uint256 denormWeight) external;
     function removeBeneficiary(address beneficiary) external;
     function removeBeneficiaryAt(uint256 index) external;
+
+    event FeeCollected(uint256 feeAmount);
+
+    function distributeToBeneficiaries() external;
 
     event SwapperAdded(address swapper);
     event SwapperRemoved(address swapper);

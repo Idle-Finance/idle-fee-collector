@@ -1,36 +1,19 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity =0.8.4;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import "./TokenExchangable.sol";
+import "./Permissioned.sol";
 
-abstract contract Beneficiaries is TokenExchangable {
+abstract contract Beneficiaries is Permissioned {
+    using SafeERC20 for IERC20;
+
     uint256 constant MAXIMUM_BENEFICIARIES = 20;
-
-    address[] private _beneficiaries;
-    uint256[] private _beneficiariesDenormWeight;
-    uint256 private _totalWeight;
     
-    mapping(address => uint256) _beneficiariesBalance;
-
-    function getBeneficiaries() external view returns (address[] memory) {
-        return _beneficiaries;
-    }
-
-    function _addBeneficiary(address beneficiary, uint256 denormWeight) internal {
-        _totalWeight += denormWeight;
-
-        _beneficiaries.push(beneficiary);
-        _beneficiariesDenormWeight.push(denormWeight);
-
-        emit BeneficiaryAdded(beneficiary, denormWeight, _totalWeight);
-    }
-
-    function addBeneficiary(address beneficiary, uint256 denormWeight) onlyOwner external override {
-        require(_beneficiaries.length < MAXIMUM_BENEFICIARIES, "FC: MAXIMUM BENEFICIARIES");
-        _addBeneficiary(beneficiary, denormWeight);
-    }
-
+    IERC20 public _outToken;
+ReentrancyGuard
     function _indexOfBeneficiary(address beneficiary) internal view returns (uint256 index) {
         for (index = 0; index < _beneficiaries.length; index++) {
             if (_beneficiaries[index] == beneficiary) {
@@ -88,8 +71,49 @@ abstract contract Beneficiaries is TokenExchangable {
         _removeBeneficiaryAt(index);
     }
 
-    function updateBalances() external override {}
+    function _distributeToBeneficiaries() internal {
+        uint256 tokenBalance = _outToken.balanceOf(address(this));
 
-    function withdraw() external override {}
-    function withdrawFor(address beneficiary) external override {}
+        if (tokenBalance > _feeToDistribute) {
+            uint256 toDistribute = tokenBalance - _feeToDistribute;
+            uint256 distributed = 0;
+            uint256 forBeneficiary;
+            
+            for (uint256 i = 0; i < _beneficiaries.length; i++) {
+                address beneficiary = _beneficiaries[i];
+
+                if (i == _beneficiaries.length - 1) {
+                    _beneficiariesBalance[beneficiary] += toDistribute - distributed;
+                } else {
+                    forBeneficiary = (toDistribute * _beneficiariesDenormWeight[i]) / _totalWeight;
+                    distributed += forBeneficiary;
+                    _beneficiariesBalance[beneficiary] = forBeneficiary;
+                }
+            }
+
+            emit FeeCollected(toDistribute);
+        }
+    }
+
+    function distributeToBeneficiaries() nonReentrant external override {
+        _distributeToBeneficiaries();
+    }
+
+    function _withdraw(address beneficiary) internal {
+        uint256 amount = _beneficiariesBalance[beneficiary];
+
+        require(amount != 0, "FC: BALANCE=0");
+
+        _beneficiariesBalance[beneficiary] = 0;
+        _feeToDistribute -= amount;
+
+        _outToken.safeTransfer(beneficiary, amount);
+    }
+
+    function withdraw() nonReentrant external override {
+        _withdraw(msg.sender);
+    }
+    function withdrawFor(address beneficiary) nonReentrant external override {
+        _withdraw(beneficiary);
+    }
 }

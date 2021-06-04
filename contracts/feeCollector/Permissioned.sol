@@ -1,11 +1,14 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity=0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "../interfaces/IFeeCollector.sol";
 
-abstract contract Permissioned is IFeeCollector, Ownable, Initializable {
+abstract contract Permissioned is IFeeCollector, Ownable, Initializable, ReentrancyGuard {
     mapping(address => bool) private _canSwap;
 
     modifier swapperOnly() {
