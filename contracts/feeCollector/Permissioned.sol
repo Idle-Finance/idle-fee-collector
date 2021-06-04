@@ -1,10 +1,11 @@
 pragma solidity=0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
 import "../interfaces/IFeeCollector.sol";
 
-abstract contract Permissioned is IFeeCollector, Ownable {
+abstract contract Permissioned is IFeeCollector, Ownable, Initializable {
     mapping(address => bool) private _canSwap;
 
     modifier swapperOnly() {

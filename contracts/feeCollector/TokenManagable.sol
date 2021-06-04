@@ -15,11 +15,6 @@ abstract contract TokenManagable is Permissioned {
         _;
     }
 
-    modifier tokenIsNotExchangable(IERC20 token) {
-        require(address(_tokenExchanges[token]) == address(0));
-        _;
-    }
-
     function addToken(IERC20 token, ITokenExchange tokenExchange) onlyOwner external override {
         _tokenExchanges[token] = tokenExchange;
 

@@ -8,6 +8,12 @@ import "./TokenManagable.sol";
 abstract contract TokenExchangable is TokenManagable {
     using SafeERC20 for IERC20;
 
+    IERC20 private _outToken;
+
+    function _setOutputToken(IERC20 outToken) internal initializer {
+        _outToken = outToken;
+    }
+
     function swap(IERC20 token, uint256 minAmountOut) swapperOnly external override {}
     function swapMany(IERC20[] calldata tokens, uint256[] calldata minAmountsOut) swapperOnly external override {}
 }

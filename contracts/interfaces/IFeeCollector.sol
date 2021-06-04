@@ -20,16 +20,19 @@ interface IFeeCollector {
 
     event FeeClaimed(address indexed beneficiary, uint256 amount);
 
+    function updateBalances() external;
     function withdraw() external;
     function withdrawFor(address beneficiary) external;
 
-    event BeneficiaryAdded(address beneficiary, uint256 denormWeight, uint256 weightTotal);
-    event BeneficiaryUpdated(address beneficiary, uint256 denormWeight, uint256 weightTotal);
-    event BeneficiaryRemoved(address beneficiary, uint256 weightTotal);
+    event BeneficiaryAdded(address beneficiary, uint256 denormWeight, uint256 totalWeight);
+    event BeneficiaryUpdated(address beneficiary, uint256 denormWeight, uint256 totalWeight);
+    event BeneficiaryRemoved(address beneficiary, uint256 totalWeight);
     
     function addBeneficiary(address beneficiary, uint256 denormWeight) external;
     function updateBeneficiary(address beneficiary, uint256 denormWeight) external;
+    function updateBeneficiaryAt(uint256 index, uint256 denormWeight) external;
     function removeBeneficiary(address beneficiary) external;
+    function removeBeneficiaryAt(uint256 index) external;
 
     event SwapperAdded(address swapper);
     event SwapperRemoved(address swapper);
