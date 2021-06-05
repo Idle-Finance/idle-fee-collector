@@ -14,7 +14,7 @@ contract FeeCollector is TokenExchangable {
         Beneficiaries._setOutputToken(outToken);
     }
 
-    function withdrawERC20(IERC20 token, address destination, uint256 amount) onlyOwner override external {
+    function withdrawERC20(IERC20 token, address destination, uint256 amount) external override onlyOwner {
         token.safeTransfer(destination, amount);
     }
 }

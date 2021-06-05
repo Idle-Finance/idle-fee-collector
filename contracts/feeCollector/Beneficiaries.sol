@@ -21,7 +21,7 @@ abstract contract Beneficiaries is Permissioned {
     mapping(address => uint256) private _beneficiariesBalance;
     uint256 _feeToDistribute;
 
-    function _setOutputToken(IERC20 outToken) internal {
+    function _setOutputToken(IERC20 outToken) internal initializer {
         _outToken = outToken;
     }
 
@@ -38,7 +38,7 @@ abstract contract Beneficiaries is Permissioned {
         emit BeneficiaryAdded(beneficiary, denormWeight, _totalWeight);
     }
 
-    function addBeneficiary(address beneficiary, uint256 denormWeight) onlyOwner external override {
+    function addBeneficiary(address beneficiary, uint256 denormWeight) external override onlyOwner {
         require(_beneficiaries.length < MAXIMUM_BENEFICIARIES, "FC: MAXIMUM BENEFICIARIES");
         _addBeneficiary(beneficiary, denormWeight);
     }
@@ -60,14 +60,14 @@ abstract contract Beneficiaries is Permissioned {
         emit BeneficiaryUpdated(_beneficiaries[index], denormWeight, _totalWeight);
     }
 
-    function updateBeneficiary(address beneficiary, uint256 denormWeight) onlyOwner external override {
+    function updateBeneficiary(address beneficiary, uint256 denormWeight) external override onlyOwner {
         uint256 beneficiaryIndex = _indexOfBeneficiary(beneficiary);
         require(beneficiaryIndex != type(uint256).max, "FC: BENEFICIARY NOT FOUND");
 
         _updateBeneficiary(beneficiaryIndex, denormWeight);
     }
 
-    function updateBeneficiaryAt(uint256 index, uint256 denormWeight) onlyOwner external override {
+    function updateBeneficiaryAt(uint256 index, uint256 denormWeight) external override onlyOwner {
         require(index < _beneficiaries.length, "FC: INVALID BENEFICIARY INDEX");
 
         _updateBeneficiary(index, denormWeight);
@@ -87,20 +87,22 @@ abstract contract Beneficiaries is Permissioned {
         emit BeneficiaryRemoved(beneficiary, _totalWeight);
     }
 
-    function removeBeneficiary(address beneficiary) onlyOwner external override {
+    function removeBeneficiary(address beneficiary) external override onlyOwner {
         uint256 beneficiaryIndex = _indexOfBeneficiary(beneficiary);
         require(beneficiaryIndex != type(uint256).max, "FC: BENEFICIARY NOT FOUND");
 
         _removeBeneficiaryAt(beneficiaryIndex);
     }
 
-    function removeBeneficiaryAt(uint256 index) onlyOwner external override {
+    function removeBeneficiaryAt(uint256 index) external override onlyOwner {
         require(index < _beneficiaries.length, "FC: INVALID BENEFICIARY INDEX");
 
         _removeBeneficiaryAt(index);
     }
 
     function _distributeToBeneficiaries() internal {
+        require(_totalWeight > 0, "FC: NO BENEFICIARIES");
+
         uint256 tokenBalance = _outToken.balanceOf(address(this));
 
         if (tokenBalance > _feeToDistribute) {
@@ -124,7 +126,7 @@ abstract contract Beneficiaries is Permissioned {
         }
     }
 
-    function distributeToBeneficiaries() nonReentrant external override {
+    function distributeToBeneficiaries() external override {
         _distributeToBeneficiaries();
     }
 
@@ -137,12 +139,14 @@ abstract contract Beneficiaries is Permissioned {
         _feeToDistribute -= amount;
 
         _outToken.safeTransfer(beneficiary, amount);
+
+        emit FeeClaimed(beneficiary, amount);
     }
 
-    function withdraw() nonReentrant external override {
+    function withdraw() external override nonReentrant {
         _withdraw(msg.sender);
     }
-    function withdrawFor(address beneficiary) nonReentrant external override {
+    function withdrawFor(address beneficiary) external override nonReentrant {
         _withdraw(beneficiary);
     }
 }

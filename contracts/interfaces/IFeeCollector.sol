@@ -5,9 +5,32 @@ pragma solidity =0.8.4;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ITokenExchange.sol";
 
+/**
+  @title IFeeCollector
+  @author Asaf Silman
+  @notice Defines the functions and events required to implement a FeeCollector
+  */
+
 interface IFeeCollector {
+    /**
+      @notice Emitted when a token is added with an exchange to be swapped
+      @dev Used in TokenManagable.sol
+      @param token The ERC20 token which is added
+      @param tokenExchange The intermediate token exchange contract
+      */
     event TokenAdded(IERC20 token, ITokenExchange tokenExchange);
+    /**
+      @notice Emitted when a token exchange is updated
+      @dev Used in TokenManagable.sol
+      @param token The ERC20 token which is updated
+      @param tokenExchange The intermediate token exchange contract
+     */
     event TokenExchangeUpdated(IERC20 token, ITokenExchange tokenExchange);
+    /**
+      @notice Emitted when a token is removed from the feeCollector
+      @dev Used in TokenManagable.sol
+      @param token The ERC20 token which is removed
+     */
     event TokenRemoved(IERC20 token);
 
     function addToken(IERC20 token, ITokenExchange tokenExchange) external;

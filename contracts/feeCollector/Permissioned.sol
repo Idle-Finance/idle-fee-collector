@@ -2,13 +2,13 @@
 
 pragma solidity=0.8.4;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "../interfaces/IFeeCollector.sol";
 
-abstract contract Permissioned is IFeeCollector, Ownable, Initializable, ReentrancyGuard {
+abstract contract Permissioned is IFeeCollector, OwnableUpgradeable, ReentrancyGuardUpgradeable {
     mapping(address => bool) private _canSwap;
 
     modifier swapperOnly() {
