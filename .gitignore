@@ -1,4 +1,12 @@
+# Node
 node_modules/
 
+# Typescript
+dist/
+
+# Hardhat
 artifacts/
 cache/
+
+# OpenZeppelin
+.openzeppelin/unknown-*.json
