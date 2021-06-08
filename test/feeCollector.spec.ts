@@ -1,14 +1,17 @@
-import { ethers } from "hardhat";
-import { Signer } from "ethers";
+import { ethers, upgrades } from "hardhat";
+import { FeeCollector } from "../typechain/FeeCollector"
 
-describe("Token", function () {
-  let accounts: Signer[];
+describe("FeeCollector", function () {
+  let feeCollector: FeeCollector;
 
   beforeEach(async function () {
-    accounts = await ethers.getSigners();
+    const feeCollectorFactory = await ethers.getContractFactory("FeeCollector");
+    feeCollector = await upgrades.deployProxy(feeCollectorFactory, ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]) as FeeCollector;
+
+    await feeCollector.deployed();
   });
 
   it("should do something right", async function () {
-    // Do something with the accounts
+    console.log(await feeCollector.distributionToken())
   });
 });

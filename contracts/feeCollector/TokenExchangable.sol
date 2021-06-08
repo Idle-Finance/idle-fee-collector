@@ -13,9 +13,9 @@ abstract contract TokenExchangable is Beneficiaries, TokenManagable {
     using SafeERC20 for IERC20;
 
     function _swap(ITokenExchange exchange, IERC20 token, uint256 amountIn, uint256 minAmountOut) internal returns (uint256 amountOut) {
-        uint256 previousOutBalance = _outToken.balanceOf(address(this));
+        uint256 previousOutBalance = Beneficiaries._distributionToken.balanceOf(address(this));
         exchange.swap(token, amountIn, minAmountOut);
-        uint256 futureOutBalance = _outToken.balanceOf(address(this));
+        uint256 futureOutBalance = Beneficiaries._distributionToken.balanceOf(address(this));
 
 
         amountOut = futureOutBalance - previousOutBalance;

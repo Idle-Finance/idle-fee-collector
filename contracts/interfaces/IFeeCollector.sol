@@ -57,6 +57,8 @@ interface IFeeCollector {
     function removeBeneficiary(address beneficiary) external;
     function removeBeneficiaryAt(uint256 index) external;
 
+    function distributionToken() external returns (IERC20);
+
     event FeeCollected(uint256 feeAmount);
 
     function distributeToBeneficiaries() external;

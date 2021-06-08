@@ -7,6 +7,7 @@ dist/
 # Hardhat
 artifacts/
 cache/
+typechain/
 
 # OpenZeppelin
 .openzeppelin/unknown-*.json

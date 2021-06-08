@@ -12,7 +12,7 @@ abstract contract Beneficiaries is Permissioned {
 
     uint256 constant MAXIMUM_BENEFICIARIES = 20;
     
-    IERC20 public _outToken;
+    IERC20 internal _distributionToken;
 
     address[] private _beneficiaries;
     uint256[] private _beneficiariesDenormWeight;
@@ -22,7 +22,7 @@ abstract contract Beneficiaries is Permissioned {
     uint256 _feeToDistribute;
 
     function _setOutputToken(IERC20 outToken) internal initializer {
-        _outToken = outToken;
+        _distributionToken = outToken;
     }
 
     function getBeneficiaries() external view returns (address[] memory) {
@@ -103,7 +103,7 @@ abstract contract Beneficiaries is Permissioned {
     function _distributeToBeneficiaries() internal {
         require(_totalWeight > 0, "FC: NO BENEFICIARIES");
 
-        uint256 tokenBalance = _outToken.balanceOf(address(this));
+        uint256 tokenBalance = _distributionToken.balanceOf(address(this));
 
         if (tokenBalance > _feeToDistribute) {
             uint256 toDistribute = tokenBalance - _feeToDistribute;
@@ -138,7 +138,7 @@ abstract contract Beneficiaries is Permissioned {
         _beneficiariesBalance[beneficiary] = 0;
         _feeToDistribute -= amount;
 
-        _outToken.safeTransfer(beneficiary, amount);
+        _distributionToken.safeTransfer(beneficiary, amount);
 
         emit FeeClaimed(beneficiary, amount);
     }
@@ -148,5 +148,9 @@ abstract contract Beneficiaries is Permissioned {
     }
     function withdrawFor(address beneficiary) external override nonReentrant {
         _withdraw(beneficiary);
+    }
+    
+    function distributionToken() external override view returns (IERC20) {
+        return _distributionToken;
     }
 }
