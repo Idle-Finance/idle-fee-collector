@@ -37,10 +37,10 @@ interface IFeeCollector {
     function updateTokenExchange(IERC20 token, ITokenExchange tokenExchange) external;
     function removeToken(IERC20 token) external;
 
-    event TokenSwapped(IERC20 indexed token, uint256 amountIn, uint256 amountOut, ITokenExchange exchange);
+    event TokenExchanged(IERC20 indexed token, uint256 amountIn, uint256 amountOut, ITokenExchange exchange);
 
-    function swap(IERC20 token, uint256 minAmountOut) external returns (uint256);
-    function swapMany(IERC20[] calldata tokens, uint256[] calldata minAmountsOut) external returns (uint256);
+    function exchange(IERC20 token, uint256 minAmountOut) external returns (uint256);
+    function exchangeMany(IERC20[] calldata tokens, uint256[] calldata minAmountsOut) external returns (uint256);
 
     event FeeClaimed(address indexed beneficiary, uint256 amount);
 

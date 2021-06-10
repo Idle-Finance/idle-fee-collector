@@ -21,7 +21,7 @@ contract ExchangeUNIv3 is ITokenExchange, ReentrancyGuard {
         _tokenOut = tokenOut;
     }
 
-    function swap(IERC20 tokenIn, uint256 amountIn, uint256 amountOut) nonReentrant external override {
+    function exchange(IERC20 tokenIn, uint256 amountIn, uint256 amountOut) nonReentrant external override {
         tokenIn.safeTransferFrom(msg.sender, address(this), amountIn);
         tokenIn.safeIncreaseAllowance(address(_router), amountIn);
 

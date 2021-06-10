@@ -12,32 +12,32 @@ import "./TokenManagable.sol";
 abstract contract TokenExchangable is Beneficiaries, TokenManagable {
     using SafeERC20 for IERC20;
 
-    function _swap(ITokenExchange exchange, IERC20 token, uint256 amountIn, uint256 minAmountOut) internal returns (uint256 amountOut) {
+    function _exchange(ITokenExchange tokenExchange, IERC20 token, uint256 amountIn, uint256 minAmountOut) internal returns (uint256 amountOut) {
         uint256 previousOutBalance = Beneficiaries._distributionToken.balanceOf(address(this));
-        exchange.swap(token, amountIn, minAmountOut);
+        tokenExchange.exchange(token, amountIn, minAmountOut);
         uint256 futureOutBalance = Beneficiaries._distributionToken.balanceOf(address(this));
 
 
         amountOut = futureOutBalance - previousOutBalance;
         require(amountOut >= minAmountOut, "FC: AMOUNT OUT");
 
-        emit TokenSwapped(token, amountIn, minAmountOut, exchange);
+        emit TokenExchanged(token, amountIn, minAmountOut, tokenExchange);
     }
 
-    function swap(IERC20 token, uint256 minAmountOut) external override nonReentrant swapperOnly returns (uint256 amountOut) {
-        ITokenExchange exchange = getTokenExchange(token);
+    function exchange(IERC20 token, uint256 minAmountOut) external override nonReentrant swapperOnly returns (uint256 amountOut) {
+        ITokenExchange tokenExchange = getTokenExchange(token);
 
-        amountOut = _swap(exchange, token, token.balanceOf(address(this)), minAmountOut);
+        amountOut = _exchange(tokenExchange, token, token.balanceOf(address(this)), minAmountOut);
 
         _distributeToBeneficiaries();
     }
-    function swapMany(IERC20[] calldata tokens, uint256[] calldata minAmountsOut) external override nonReentrant swapperOnly returns (uint256 amountOut) {
+    function exchangeMany(IERC20[] calldata tokens, uint256[] calldata minAmountsOut) external override nonReentrant swapperOnly returns (uint256 amountOut) {
         require(tokens.length == minAmountsOut.length, "FC: INVALID LENGTH");
 
         for (uint256 i = 0; i < tokens.length; i++) {
-            ITokenExchange exchange = getTokenExchange(tokens[i]);
+            ITokenExchange tokenExchange = getTokenExchange(tokens[i]);
 
-            amountOut += _swap(exchange, tokens[i], tokens[i].balanceOf(address(this)), minAmountsOut[i]);
+            amountOut += _exchange(tokenExchange, tokens[i], tokens[i].balanceOf(address(this)), minAmountsOut[i]);
         }
 
         _distributeToBeneficiaries();
