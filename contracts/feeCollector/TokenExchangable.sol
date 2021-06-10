@@ -24,14 +24,14 @@ abstract contract TokenExchangable is Beneficiaries, TokenManagable {
         emit TokenExchanged(token, amountIn, minAmountOut, tokenExchange);
     }
 
-    function exchange(IERC20 token, uint256 minAmountOut) external override nonReentrant swapperOnly returns (uint256 amountOut) {
+    function exchange(IERC20 token, uint256 minAmountOut) external override nonReentrant exchangerOnly returns (uint256 amountOut) {
         ITokenExchange tokenExchange = getTokenExchange(token);
 
         amountOut = _exchange(tokenExchange, token, token.balanceOf(address(this)), minAmountOut);
 
         _distributeToBeneficiaries();
     }
-    function exchangeMany(IERC20[] calldata tokens, uint256[] calldata minAmountsOut) external override nonReentrant swapperOnly returns (uint256 amountOut) {
+    function exchangeMany(IERC20[] calldata tokens, uint256[] calldata minAmountsOut) external override nonReentrant exchangerOnly returns (uint256 amountOut) {
         require(tokens.length == minAmountsOut.length, "FC: INVALID LENGTH");
 
         for (uint256 i = 0; i < tokens.length; i++) {

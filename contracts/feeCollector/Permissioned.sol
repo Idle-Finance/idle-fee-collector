@@ -9,26 +9,26 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "../interfaces/IFeeCollector.sol";
 
 abstract contract Permissioned is IFeeCollector, OwnableUpgradeable, ReentrancyGuardUpgradeable {
-    mapping(address => bool) private _canSwap;
+    mapping(address => bool) private _canExchange;
 
-    modifier swapperOnly() {
-        require(_canSwap[msg.sender], "FC: NOT SWAPPER");
+    modifier exchangerOnly() {
+        require(_canExchange[msg.sender], "FC: NOT EXCHANGER");
         _;
     }
 
-    function addSwapper(address swapper) external override onlyOwner {
-        _canSwap[swapper] = true;
+    function addExchanger(address exchanger) external override onlyOwner {
+        _canExchange[exchanger] = true;
 
-        emit SwapperAdded(swapper);
+        emit ExchangerAdded(exchanger);
     }
 
-    function removeSwapper(address swapper) external override onlyOwner {
-        _canSwap[swapper] = false;
+    function removeExchanger(address exchanger) external override onlyOwner {
+        _canExchange[exchanger] = false;
 
-        emit SwapperRemoved(swapper);
+        emit ExchangerRemoved(exchanger);
     }
 
-    function canSwap(address swapper) external override view returns (bool) {
-        return _canSwap[swapper];
+    function canExchange(address exchanger) external override view returns (bool) {
+        return _canExchange[exchanger];
     }
 }

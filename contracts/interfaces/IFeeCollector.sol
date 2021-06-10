@@ -13,7 +13,7 @@ import "./ITokenExchange.sol";
 
 interface IFeeCollector {
     /**
-      @notice Emitted when a token is added with an exchange to be swapped
+      @notice Emitted when a token added to the fee collector
       @dev Used in TokenManagable.sol
       @param token The ERC20 token which is added
       @param tokenExchange The intermediate token exchange contract
@@ -63,12 +63,12 @@ interface IFeeCollector {
 
     function distributeToBeneficiaries() external;
 
-    event SwapperAdded(address swapper);
-    event SwapperRemoved(address swapper);
+    event ExchangerAdded(address exchanger);
+    event ExchangerRemoved(address exchanger);
 
-    function addSwapper(address swapper) external;
-    function removeSwapper(address swapper) external;
-    function canSwap(address swapper) external returns (bool);
+    function addExchanger(address exchanger) external;
+    function removeExchanger(address exchanger) external;
+    function canExchange(address exchanger) external returns (bool);
 
     function withdrawERC20(IERC20 token, address destination, uint256 amount) external;
 }
