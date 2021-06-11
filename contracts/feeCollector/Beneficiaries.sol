@@ -21,7 +21,7 @@ abstract contract Beneficiaries is Permissioned {
     mapping(address => uint256) private _beneficiariesBalance;
     uint256 _feeToDistribute;
 
-    function _setOutputToken(IERC20 outToken) internal initializer {
+    function __Beneficiaries_init(IERC20 outToken) internal initializer {
         _distributionToken = outToken;
     }
 

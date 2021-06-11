@@ -11,7 +11,8 @@ contract FeeCollector is TokenExchangable {
     using SafeERC20 for IERC20;
 
     function initialize(IERC20 outToken) public initializer {
-        Beneficiaries._setOutputToken(outToken);
+        OwnableUpgradeable.__Ownable_init();
+        Beneficiaries.__Beneficiaries_init(outToken);
     }
 
     function withdrawERC20(IERC20 token, address destination, uint256 amount) external override onlyOwner {
